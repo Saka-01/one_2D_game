@@ -1,0 +1,35 @@
+# Unity generated folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]serSettings/
+MemoryCaptures/
+[Rr]ecordings/
+
+# IDE / editor
+.vs/
+.idea/
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+.vsconfig
+
+# Builds
+*.apk
+*.aab
+*.ipa
+*.unitypackage
+*.app
+
+# Crashlytics
+crashlytics-build.properties
+/[Aa]ssets/AssetStoreTools*
+
+# Plastic SCM / Unity Version Control
+*.ignore
+.merge_file*
