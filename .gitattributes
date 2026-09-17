@@ -1,0 +1,48 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Unity metadata files must use LF to avoid churn
+*.meta text
+*.asmdef text
+*.shader text
+*.cginc text
+
+# C# source
+*.cs text
+
+# Unity YAML assets: LF, avoids noisy diffs
+*.unity text
+*.prefab text
+*.asset text
+*.mat text
+*.anim text
+*.controller text
+
+# Windows scripts keep CRLF
+*.bat text eol=crlf
+
+# Binary assets — never convert line endings
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.psd binary
+*.tif binary
+*.tiff binary
+*.fbx binary
+*.obj binary
+*.blend binary
+*.wav binary
+*.mp3 binary
+*.ogg binary
+*.mp4 binary
+*.avi binary
+*.pdf binary
+*.ttf binary
+*.otf binary
+*.dll binary
+*.exe binary
+*.so binary
+*.a binary
+*.bin binary
+*.unitypackage binary
