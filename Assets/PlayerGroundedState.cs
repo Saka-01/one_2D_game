@@ -45,15 +45,14 @@ public class PlayerGroundedState : PlayerState
             return;
         }
 
-        // 这里不再直接使用 Input.GetKeyDown(KeyCode.K)。
-        //
-        // Player.Update 会先把 K 键请求保存到跳跃缓冲计时器中，
-        // 因此即使玩家在落地前短暂按下 K，
-        // 只要仍处于缓冲时间内，也可以在落地后跳跃。
+        // 跳跃预输入在地面上生效。
         if (player.HasJumpBuffered)
         {
             // 一个预输入只能触发一次跳跃。
             player.ConsumeJumpBuffer();
+
+            // 清除土狼时间，避免起跳后短时间内再次触发空中跳跃。
+            player.ConsumeCoyoteTime();
 
             stateMachine.ChangeState(player.jumpState);
             return;

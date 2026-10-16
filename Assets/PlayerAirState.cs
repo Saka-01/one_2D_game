@@ -32,6 +32,17 @@ public class PlayerAirState : PlayerState
         // 读取输入、更新计时器和 Animator 的 yVelocity。
         base.Update();
 
+        // 玩家刚离开平台后，如果仍有有效的跳跃预输入，
+        // 就允许执行一次土狼跳。
+        if (player.HasJumpBuffered && player.HasCoyoteTime)
+        {
+            player.ConsumeJumpBuffer();
+            player.ConsumeCoyoteTime();
+
+            stateMachine.ChangeState(player.jumpState);
+            return;
+        }
+
         // 空中水平移动。
         //
         // 由于 PlayerJumpState 继承 PlayerAirState，

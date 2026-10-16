@@ -48,8 +48,15 @@ public class Player : MonoBehaviour
     [Min(0f)]
     public float jumpBufferDuration = 0.12f;
 
-    // 当前还剩多少预输入时间。
+    [Tooltip("离开地面后仍然允许起跳的时间。单位：秒。")]
+    [Min(0f)]
+    public float coyoteDuration = 0.10f;
+
+    // 当前还剩多少跳跃预输入时间。
     private float jumpBufferTimer;
+
+    // 当前还剩多少土狼时间。
+    private float coyoteTimer;
 
     public int facingDir { get; private set; } = 1;
     private bool facingRight = true;
@@ -108,10 +115,9 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        // 必须在当前状态 Update 之前记录预输入。
-        // 这样 GroundedState、AirState 和 WallSlideState
-        // 在同一帧都可以读取到这个跳跃请求。
+        // 必须在当前状态 Update 之前记录输入和土狼时间。
         UpdateJumpBuffer();
+        UpdateCoyoteTime();
 
         stateMachine.currentState.Update();
         CheckForDashInput();
@@ -119,9 +125,6 @@ public class Player : MonoBehaviour
 
     /// <summary>
     /// 更新跳跃预输入计时器。
-    ///
-    /// 玩家按下 K 后，保存一个短暂的跳跃请求。
-    /// 即使按下时玩家还没有落地，之后落地时仍然可以自动跳跃。
     /// </summary>
     private void UpdateJumpBuffer()
     {
@@ -136,19 +139,50 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
+    /// 更新土狼时间。
+    ///
+    /// 只要玩家接触地面，就刷新土狼计时器；
+    /// 离开地面后，计时器开始倒计时。
+    /// </summary>
+    private void UpdateCoyoteTime()
+    {
+        if (IsGroundDetected())
+        {
+            coyoteTimer = coyoteDuration;
+        }
+        else
+        {
+            coyoteTimer -= Time.deltaTime;
+        }
+    }
+
+    /// <summary>
     /// 当前是否存在有效的跳跃预输入。
     /// </summary>
     public bool HasJumpBuffered => jumpBufferTimer > 0f;
 
     /// <summary>
+    /// 当前是否仍处于土狼时间内。
+    /// </summary>
+    public bool HasCoyoteTime => coyoteTimer > 0f;
+
+    /// <summary>
     /// 消费掉一次跳跃预输入。
-    ///
-    /// 一次跳跃只能消费一次，避免同一个按键请求
-    /// 同时触发普通跳和其他跳跃。
     /// </summary>
     public void ConsumeJumpBuffer()
     {
         jumpBufferTimer = 0f;
+    }
+
+    /// <summary>
+    /// 消费掉一次土狼时间。
+    ///
+    /// 普通起跳或土狼跳使用后必须清零，
+    /// 防止一次起跳被错误地识别成二次跳跃。
+    /// </summary>
+    public void ConsumeCoyoteTime()
+    {
+        coyoteTimer = 0f;
     }
 
     private void CheckForDashInput()
@@ -177,12 +211,8 @@ public class Player : MonoBehaviour
 
     /// <summary>
     /// 使用多条脚底射线检测地面。
-    ///
     /// 只要左、中、右任意一条射线碰到地面，
     /// 就认为玩家仍然站在地面上。
-    ///
-    /// 这样角色即使有一部分身体伸出平台边缘，
-    /// 只要仍有脚底区域接触平台，就不会误判为空中。
     /// </summary>
     public bool IsGroundDetected()
     {
@@ -216,7 +246,6 @@ public class Player : MonoBehaviour
         {
             float normalizedPosition = i / (float)(rayCount - 1);
             float rayX = Mathf.Lerp(leftX, rightX, normalizedPosition);
-
             Vector2 rayOrigin = new Vector2(rayX, rayY);
 
             if (Physics2D.Raycast(
