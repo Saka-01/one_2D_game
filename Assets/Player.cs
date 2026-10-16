@@ -2,12 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class Player : MonoBehaviour
 {
     [Header("移动")]
     public float moveSpeed = 12.0f;
     public float jumpForce;
+
+    [Header("墙面移动")]
+    [Tooltip("贴墙时最大的向下滑落速度。")]
+    public float wallSlideSpeed = 5f;
+    [Tooltip("蹬墙跳时的水平推力。")]
+    public float wallJumpHorizontalForce = 7f;
+    [Tooltip("蹬墙跳时的垂直推力。")]
+    public float wallJumpVerticalForce = 12f;
+    [Tooltip("蹬墙后暂时锁定水平速度的时间，避免立即回到墙上。")]
+    public float wallJumpControlLockDuration = 0.12f;
+
 
     [Header("冲刺")]
     [SerializeField] private float dashCooldown;
@@ -22,6 +34,11 @@ public class Player : MonoBehaviour
     [SerializeField] private Transform wallCheck;
     [SerializeField] private float wallCheckDistance;
     [SerializeField] private LayerMask whatIsGround;
+
+    [Header("跳跃")]
+    [Tooltip("松开跳跃键时，保留多少向上速度。越小，短跳越明显。")]
+    [Range(0.1f, 1f)]
+    public float jumpCutMultiplier = 0.45f;
 
     public int facingDir { get; private set; } = 1;
     private bool facingRight = true;
@@ -41,7 +58,9 @@ public class Player : MonoBehaviour
     public PlayerMoveState moveState { get; private set; }
     public PlayerJumpState jumpState { get; private set; }
     public PlayerAirState airState { get; private set; }
+    public PlayerWallSlideState wallSlide {  get; private set; }
     public PlayerDashState dashState { get; private set; }
+    public PlayerWallJumpState wallJump {  get; private set; }  
 
     #endregion
 
@@ -55,6 +74,8 @@ public class Player : MonoBehaviour
         jumpState = new PlayerJumpState(this, stateMachine, "Jump");
         airState  = new PlayerAirState(this, stateMachine, "Jump");
         dashState = new PlayerDashState(this, stateMachine, "Dash");
+        wallSlide = new PlayerWallSlideState(this, stateMachine, "WallSlide");
+        wallJump = new PlayerWallJumpState(this, stateMachine, "Jump");
 
     }
 
@@ -69,6 +90,7 @@ public class Player : MonoBehaviour
     {
         stateMachine.currentState.Update();
         CheckForDashInput();
+
 
     }
 
@@ -97,6 +119,7 @@ public class Player : MonoBehaviour
 
 
     public bool IsGroundDetected() => Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, whatIsGround);
+    public bool IsWallDetected() => Physics2D.Raycast(wallCheck.position, Vector2.right * facingDir, wallCheckDistance, whatIsGround);
 
     private void OnDrawGizmos()
     {
@@ -119,6 +142,9 @@ public class Player : MonoBehaviour
         else if(_x < 0 && facingRight)
             Filp();
     }
+
+
+
 
 
 }

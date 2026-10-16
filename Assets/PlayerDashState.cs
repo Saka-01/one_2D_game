@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.SceneTemplate;
 using UnityEngine;
 
 public class PlayerDashState : PlayerState
@@ -32,7 +31,13 @@ public class PlayerDashState : PlayerState
         Debug.Log("Œ“‘⁄≥Â");
         if(stateTimer < 0)
         {
-            stateMachine.ChangeState(player.idleState);
+            if (player.IsGroundDetected())
+            {
+                stateMachine.ChangeState(player.idleState);
+            }
+            else {
+                stateMachine.ChangeState(player.airState);
+            }
         }
     }
 }
