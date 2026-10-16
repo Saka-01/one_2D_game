@@ -630,7 +630,7 @@ MonoBehaviour:
   moveSpeed: 8
   jumpForce: 15
   wallSlideSpeed: 5
-  wallJumpHorizontalForce: 7
+  wallJumpHorizontalForce: 10
   wallJumpVerticalForce: 12
   wallJumpControlLockDuration: 0.12
   dashCooldown: 0.45

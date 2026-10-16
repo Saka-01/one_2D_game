@@ -14,7 +14,7 @@ public class Player : MonoBehaviour
     [Tooltip("贴墙时最大的向下滑落速度。")]
     public float wallSlideSpeed = 5f;
     [Tooltip("蹬墙跳时的水平推力。")]
-    public float wallJumpHorizontalForce = 7f;
+    public float wallJumpHorizontalForce = 10f;
     [Tooltip("蹬墙跳时的垂直推力。")]
     public float wallJumpVerticalForce = 12f;
     [Tooltip("蹬墙后暂时锁定水平速度的时间，避免立即回到墙上。")]
