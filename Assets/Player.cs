@@ -9,6 +9,11 @@ public class Player : MonoBehaviour
     [Header("攻击位移")]
     public Vector2[] attackMovement;
 
+    [Header("攻击输入")]
+    [Tooltip("攻击输入预输入的有效时间。单位：秒。")]
+    [Min(0f)]
+    public float attackBufferDuration = 0.12f;
+
     [Header("墙面移动")]
     [Tooltip("贴墙时允许的最大下滑速度。")]
     public float wallSlideSpeed = 5f;
@@ -57,6 +62,9 @@ public class Player : MonoBehaviour
 
     // 当前还剩多少跳跃预输入时间。
     private float jumpBufferTimer;
+
+    // 当前还剩多少攻击预输入时间。
+    private float attackBufferTimer;
 
     // 当前还剩多少土狼时间。
     private float coyoteTimer;
@@ -125,6 +133,7 @@ public class Player : MonoBehaviour
     {
         // 必须在当前状态 Update 之前记录输入和土狼时间。
         UpdateJumpBuffer();
+        UpdateAttackBuffer();
         UpdateCoyoteTime();
 
         stateMachine.currentState.Update();
@@ -132,7 +141,21 @@ public class Player : MonoBehaviour
     }
 
 
-    public void AnimationTrigger() => stateMachine.currentState.AnimationFinishTrigger();
+    /// <summary>
+    /// 由攻击动画末尾的 Animation Event 调用。
+    ///
+    /// 只有当前状态确实是攻击状态时，
+    /// 才允许把动画结束信号交给状态机。
+    /// 这样可以避免动画切换较快时，
+    /// 旧攻击动画的事件误结束其他状态。
+    /// </summary>
+    public void AnimationTrigger()
+    {
+        if (stateMachine.currentState == primaryAttack)
+        {
+            stateMachine.currentState.AnimationFinishTrigger();
+        }
+    }
 
 
 
@@ -152,6 +175,35 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
+    /// 更新攻击预输入计时器。
+    ///
+    /// 攻击动画播放期间按下 J，
+    /// 请求会暂存一小段时间，等待当前攻击结束后消费。
+    /// </summary>
+    private void UpdateAttackBuffer()
+    {
+        attackBufferTimer -= Time.deltaTime;
+
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            attackBufferTimer = attackBufferDuration;
+        }
+    }
+
+    /// <summary>
+    /// 当前是否存在有效的攻击预输入。
+    /// </summary>
+    public bool HasAttackBuffered => attackBufferTimer > 0f;
+
+    /// <summary>
+    /// 消费一次攻击预输入。
+    /// </summary>
+    public void ConsumeAttackBuffer()
+    {
+        attackBufferTimer = 0f;
+    }
+
+    /// <summary>
     /// 更新土狼时间。
     ///
     /// 只要玩家接触地面，就刷新土狼计时器；
@@ -168,6 +220,7 @@ public class Player : MonoBehaviour
             coyoteTimer -= Time.deltaTime;
         }
     }
+
 
     /// <summary>
     /// 当前是否存在有效的跳跃预输入。

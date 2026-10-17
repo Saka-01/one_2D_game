@@ -54,13 +54,25 @@ public class PlayerGroundedState : PlayerState
             // 清除土狼时间，避免起跳后短时间内再次触发空中跳跃。
             player.ConsumeCoyoteTime();
 
+            // 同一帧同时按下攻击和跳跃时，跳跃优先，
+            // 丢弃攻击请求，避免落地后意外追加一次攻击。
+            player.ConsumeAttackBuffer();
+
             stateMachine.ChangeState(player.jumpState);
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.J))
+        // 当前帧按下 J，或者攻击请求仍在有效缓冲时间内，
+        // 都可以进入攻击状态。
+        //
+        // 第一次进入攻击时消费的是当前这次 J；
+        // 攻击过程中再次按 J，则会由 PlayerPrimaryAttackState
+        // 在当前攻击结束时消费，形成连击。
+        if (player.HasAttackBuffered)
         {
+            player.ConsumeAttackBuffer();
             stateMachine.ChangeState(player.primaryAttack);
+            return;
         }
     }
 }
