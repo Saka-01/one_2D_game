@@ -6,6 +6,9 @@ public class Player : MonoBehaviour
     public float moveSpeed = 12.0f;
     public float jumpForce;
 
+    [Header("攻击位移")]
+    public Vector2[] attackMovement;
+
     [Header("墙面移动")]
     [Tooltip("贴墙时允许的最大下滑速度。")]
     public float wallSlideSpeed = 5f;
@@ -85,6 +88,8 @@ public class Player : MonoBehaviour
     public PlayerDashState dashState { get; private set; }
     public PlayerWallJumpState wallJump { get; private set; }
 
+    public PlayerPrimaryAttackState primaryAttack { get; private set; }
+
     #endregion
 
     private void Awake()
@@ -105,6 +110,9 @@ public class Player : MonoBehaviour
         dashState = new PlayerDashState(this, stateMachine, "Dash");
         wallSlide = new PlayerWallSlideState(this, stateMachine, "WallSlide");
         wallJump = new PlayerWallJumpState(this, stateMachine, "Jump");
+
+        primaryAttack = new PlayerPrimaryAttackState(this, stateMachine, "Attack");
+ 
     }
 
     private void Start()
@@ -122,6 +130,11 @@ public class Player : MonoBehaviour
         stateMachine.currentState.Update();
         CheckForDashInput();
     }
+
+
+    public void AnimationTrigger() => stateMachine.currentState.AnimationFinishTrigger();
+
+
 
     /// <summary>
     /// 更新跳跃预输入计时器。
@@ -202,6 +215,8 @@ public class Player : MonoBehaviour
             stateMachine.ChangeState(dashState);
         }
     }
+
+    public void ZeroVelocity() => rb.velocity = new Vector2(0f, 0f);
 
     public void SetVelocity(float _xVelocity, float _yVelocity)
     {

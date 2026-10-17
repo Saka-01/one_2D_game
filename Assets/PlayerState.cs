@@ -42,6 +42,8 @@ public class PlayerState
     // 每帧会减少 Time.deltaTime。
     protected float stateTimer;
 
+    protected bool triggerCalled;
+
     /// <summary>
     /// 当前对象是否仍然是状态机正在运行的状态。
     ///
@@ -89,6 +91,8 @@ public class PlayerState
         // 例如进入 MoveState：
         // Animator 中的 Move Bool 会变为 true。
         player.anim.SetBool(animBoolName, true);
+
+        triggerCalled = false;
     }
 
     /// <summary>
@@ -118,5 +122,11 @@ public class PlayerState
     {
         // 关闭当前状态对应的动画参数。
         player.anim.SetBool(animBoolName, false);
+    }
+
+
+    public virtual void AnimationFinishTrigger()
+    {
+        triggerCalled = true;
     }
 }
