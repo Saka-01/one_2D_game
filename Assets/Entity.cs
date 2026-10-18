@@ -209,8 +209,14 @@ public class Entity : MonoBehaviour
             Mathf.Max(0f, halfWidth - 0.001f)
         );
 
-        float leftX = bounds.min.x + safeInset;
-        float rightX = bounds.max.x - safeInset;
+        // groundCheck 的 X 坐标作为整个检测组的偏移基准。
+        //
+        // 如果 groundCheck 位于实体中心，检测组就覆盖碰撞体本身；
+        // 如果 groundCheck 位于实体前方，检测组也会整体移动到前方。
+        // 这样同一套多射线逻辑既能服务玩家，也能服务骷髅等敌人。
+        float groundCheckOffsetX = groundCheck.position.x - bounds.center.x;
+        float leftX = bounds.min.x + groundCheckOffsetX + safeInset;
+        float rightX = bounds.max.x + groundCheckOffsetX - safeInset;
         float rayY = groundCheck.position.y;
         int rayCount = Mathf.Max(2, groundRayCount);
 
@@ -315,8 +321,11 @@ public class Entity : MonoBehaviour
                 Mathf.Max(0f, halfWidth - 0.001f)
             );
 
-            float leftX = bounds.min.x + safeInset;
-            float rightX = bounds.max.x - safeInset;
+            // 与运行时检测保持一致：
+            // groundCheck 的 X 坐标会整体偏移这组脚底射线。
+            float groundCheckOffsetX = groundCheck.position.x - bounds.center.x;
+            float leftX = bounds.min.x + groundCheckOffsetX + safeInset;
+            float rightX = bounds.max.x + groundCheckOffsetX - safeInset;
             float rayY = groundCheck.position.y;
             int rayCount = Mathf.Max(2, groundRayCount);
 
