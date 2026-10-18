@@ -79,7 +79,7 @@ public class PlayerPrimaryAttackState : PlayerState
         }
         else
         {
-            player.ZeroVelocity();
+            player.SetZeroVelocity();
         }
 
         // 攻击开始后一小段时间后清除攻击位移。
@@ -120,7 +120,7 @@ public class PlayerPrimaryAttackState : PlayerState
         // 避免覆盖后续状态的速度。
         if (stateTimer < 0 && !triggerCalled)
         {
-            player.ZeroVelocity();
+            player.SetZeroVelocity();
         }
 
         // Animation Event 会通过 Player.AnimationTrigger() 设置 triggerCalled。

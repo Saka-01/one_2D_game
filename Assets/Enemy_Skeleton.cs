@@ -12,6 +12,8 @@ public class Enemy_Skeleton : Enemy
 
     public SkeletonBattleState battleState { get; private set; }
 
+    public SkeletonAttackState attackState { get; private set; }
+
     #endregion
 
 
@@ -20,7 +22,10 @@ public class Enemy_Skeleton : Enemy
         base.Awake();
 
         IdleState = new SkeletonIdleState(this, stateMachine, "Idle", this);
-        moveState = new SkeletonMoveState(this, stateMachine,"Move",this);
+        moveState = new SkeletonMoveState(this, stateMachine, "Move", this);
+        battleState = new SkeletonBattleState(this, stateMachine, "Move", this);
+        attackState = new SkeletonAttackState(this, stateMachine, "Attack", this);
+
     }
 
     protected override void Start()

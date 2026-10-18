@@ -140,7 +140,7 @@ public class Entity : MonoBehaviour
     /// <summary>
     /// 清空实体速度，但不改变实体朝向。
     /// </summary>
-    public void ZeroVelocity()
+    public void SetZeroVelocity()
     {
         if (rb == null)
         {
